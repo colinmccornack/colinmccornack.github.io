@@ -4,26 +4,6 @@ title: About
 permalink: /about/
 ---
 
-[Reverie](https://github.com/amitmerchant1990/reverie) is a Jekyll theme which is simple and opinionated. It's actually a fork of [jekyll-now](https://github.com/barryclark/jekyll-now) with some additional features and personal touches which I've implemented to suit my needs for [my blog](https://www.amitmerchant.com).
+Hello! My name is Colin McCornack. I am currently in the PhD phase of my MD/PhD at Washington University School of Medicine, where I am in the Computational and Systems Biology program under the mentorship of [Dr. Ting Wang](wang.wustl.edu). I made this page mainly to serve as an advice repository regarding the MSTP admissions process, based on my own experiences and those of my peers. Hopefully I'll also have some links and posts regarding my thesis work, and later on maybe even my experiences with the remaining clinical phase and residency application process when that is all said and done.
 
-This is a plug-and-play Jekyll theme which you can use on GitHub Pages without even setting up a local environment.
-
-## Features
-
-- Command-line free fork-first workflow, using GitHub.com to create, customize and post to your blog
-- Fully responsive and mobile optimized base theme
-- Sass/Coffeescript support using Jekyll 2.0
-- Free hosting on your GitHub Pages user site
-- All the SEO goodies comes in-built
-- Markdown blogging
-- Syntax highlighting using Pygments
-    - [Dracula syntax theme](https://draculatheme.com/) included
-- Disqus commenting
-- Google Analytics integration
-- Fuzzy search across blog posts
-- Pagination of posts works out-of-the-box.
-- Categorize posts out-of-the box
-- RSS Feed
-- In-built sitemap
-
-Learn more about it [here](https://github.com/amitmerchant1990/reverie) on how to get started.
+This page was built using [Reverie](https://github.com/amitmerchant1990/reverie), a [Jekyll](https://github.com/barryclark/jekyll-now) theme created by [Amit Merchant](https://www.amitmerchant.com)
