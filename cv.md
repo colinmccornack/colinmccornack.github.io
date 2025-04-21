@@ -48,12 +48,10 @@ permalink: /cv/
         <div class="cv-date">2014-2019</div>
         <p>Bachelor of Arts - Music</p>
         <p>Bachelor of Science - Biochemistry and Molecular Biology<p>
-      </div>
       <div>
         <h3>Washington University School of Medicine</h3>
         <div class="cv-date">2019-Present</div>
         <p>Medical Scientist Training Program</p>
-      </div>
     </div>
   </section>
 
