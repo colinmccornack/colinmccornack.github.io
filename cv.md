@@ -1,9 +1,8 @@
 ---
 layout: page
-title: Curriculum Vitae
+title: Test Curriculum Vitae
 permalink: /cv/
 ---
-
 <style>
 /* CV-specific styles */
 .cv-container {
@@ -41,53 +40,42 @@ permalink: /cv/
 </style>
 
 <div class="cv-container">
+  <section class="cv-section">
+    <h2>Education</h2>
+    <div class="cv-two-column">
+      <div>
+        <h3>Michigan State University</h3>
+        <div class="cv-date">2014-2019</div>
+        <p>Bachelor of Arts - Music</p>
+        <p>Bachelor of Science - Biochemistry and Molecular Biology<p>
+      </div>
+      <div>
+        <h3>Washington University School of Medicine</h3>
+        <div class="cv-date">2019-Present</div>
+        <p>Medical Scientist Training Program</p>
+      </div>
+    </div>
+  </section>
 
-<section class="cv-section">
-## Education
-{: .cv-heading}
+  <section class="cv-section">
+    <h2>Experience</h2>
+    <article>
+      <h3>Senior Developer</h3>
+      <div class="cv-date">2020-Present</div>
+      <ul>
+        <li>Led team of 5 developers</li>
+        <li>Implemented CI/CD pipeline</li>
+      </ul>
+    </article>
+  </section>
 
-<div class="cv-two-column">
-<div>
-### University Name
-{: .cv-item-title}
-<div class="cv-date">2015-2019</div>
-Degree in Computer Science
-</div>
-
-<div>
-### Professional Certification
-{: .cv-item-title}
-<div class="cv-date">2020-2021</div>
-Advanced Web Development
-</div>
-</div>
-</section>
-
-<section class="cv-section">
-## Experience
-{: .cv-heading}
-
-<article>
-### Senior Developer
-{: .cv-item-title}
-<div class="cv-date">2020-Present</div>
-<ul>
-<li>Led team of 5 developers</li>
-<li>Implemented CI/CD pipeline</li>
-</ul>
-</article>
-</section>
-
-<section class="cv-section">
-## Skills
-{: .cv-heading}
-
-<ul class="cv-skills">
-<li>JavaScript</li>
-<li>Python</li>
-<li>Ruby</li>
-<li>DevOps</li>
-</ul>
-</section>
-
+  <section class="cv-section">
+    <h2>Skills</h2>
+    <ul class="cv-skills">
+      <li>JavaScript</li>
+      <li>Python</li>
+      <li>Ruby</li>
+      <li>DevOps</li>
+    </ul>
+  </section>
 </div>
