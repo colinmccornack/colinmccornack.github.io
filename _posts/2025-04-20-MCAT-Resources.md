@@ -5,7 +5,7 @@ categories: [mcat, application]
 ---
 I pulled most of these from Reddit posts and comments, you can find the links to the original posts/comments at the end of the document
 ## AAMC Resources:
-* [https://students-residents.aamc.org/prepare-mcat-exam/free-planning-and-study-resources AAMC free sample test]
+[https://students-residents.aamc.org/prepare-mcat-exam/free-planning-and-study-resources AAMC free sample test]
 * [https://students-residents.aamc.org/prepare-mcat-exam/free-planning-and-study-resources AAMC free practice test/Full-length (FL) #5]
 * [https://store.aamc.org/mcat-prep/full-length-exams.html AAMC Full-Length Exams ($35/ea)]
 * [https://store.aamc.org/aamc-mcat-section-bank-online.html AAMC Section Bank #1] and [https://store.aamc.org/aamc-mcat-official-prep-section-bank-vol-2.html #2 ($45/ea)]
