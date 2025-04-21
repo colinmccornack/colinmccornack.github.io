@@ -1,0 +1,37 @@
+.cv-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .cv-section {
+    margin-bottom: 2rem;
+  }
+  
+  .cv-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .cv-date {
+    color: #666;
+    font-size: 0.9em;
+  }
+  
+  .cv-skills {
+    columns: 2;
+    list-style: none;
+    padding: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .cv-two-column {
+      grid-template-columns: 1fr;
+    }
+    
+    .cv-skills {
+      columns: 1;
+    }
+  }
