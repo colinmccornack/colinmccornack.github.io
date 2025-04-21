@@ -44,6 +44,6 @@ I pulled most of these from Reddit posts and comments, you can find the links to
 * [UWorld QBank](https://gradschool.uworld.com/mcat/question-bank/)
 
 ## OP Credits and other MCAT guide posts: 
-[/u/arvindftw - MCAT free resource compilation](https://old.reddit.com/r/Mcat/comments/p12r0f/the_ultimate_mcat_free_resource_compilation_w/)
-[/u/Sandstorm52 - My guide to 498 to 525 while working full time](https://old.reddit.com/r/Mcat/comments/1avqg14/my_guide_to_498_to_525_while_working_full_time/)
-[/u/cheeze1617 guide](https://drive.google.com/drive/folders/151WemU5sUBxAdwgwr8TaJLnoXqdKmms7)
+* [/u/arvindftw - MCAT free resource compilation](https://old.reddit.com/r/Mcat/comments/p12r0f/the_ultimate_mcat_free_resource_compilation_w/)
+* [/u/Sandstorm52 - My guide to 498 to 525 while working full time](https://old.reddit.com/r/Mcat/comments/1avqg14/my_guide_to_498_to_525_while_working_full_time/)
+* [/u/cheeze1617 guide](https://drive.google.com/drive/folders/151WemU5sUBxAdwgwr8TaJLnoXqdKmms7)
