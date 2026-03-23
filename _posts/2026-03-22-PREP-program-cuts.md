@@ -3,7 +3,7 @@ layout: post
 title: PREP programs and the narrowing biomedical research pipeline
 categories: [research, postbacc, resource]
 ---
-TL;DR(😞) [Semi-updated spreadsheet of postbacc programs, will update in Fall of 2026](https://docs.google.com/spreadsheets/d/1Gd_M-fJQg7LHXZulluaqGmmdmZQdZPyEJAV2fgYiYB4/edit?usp=sharing)
+TL;DR(but you should read 😞) [Semi-updated spreadsheet of postbacc programs, will update in Fall of 2026](https://docs.google.com/spreadsheets/d/1Gd_M-fJQg7LHXZulluaqGmmdmZQdZPyEJAV2fgYiYB4/edit?usp=sharing)
 
 *Note: I plan to write a comparison between various postbacc options for MD/PhD applicants. I got quite sidetracked when I realized that many of the opportunities that I used to refer students to no longer existed, and wanted to give updated guidance*
 
