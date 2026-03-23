@@ -1,6 +1,6 @@
 ---
 layout: post
-title: PREP programs and the postbacc research pipeline
+title: PREP programs and the changing postbacc research pipeline
 categories: [research, postbacc, resource]
 ---
 TL;DR(but you should read 😞) [Semi-updated spreadsheet of postbacc programs, will update in Fall of 2026](https://docs.google.com/spreadsheets/d/1Gd_M-fJQg7LHXZulluaqGmmdmZQdZPyEJAV2fgYiYB4/edit?usp=sharing)
