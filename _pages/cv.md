@@ -1,6 +1,6 @@
 ---
 layout: page
-title: CV
+title: Abbreviated CV
 permalink: /cv/
 ---
 
