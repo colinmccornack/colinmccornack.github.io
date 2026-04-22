@@ -4,9 +4,9 @@ title: CV
 permalink: /cv/
 ---
 
-<span style="float:center;"> **Colin McCornack** </span>
+<p style="text-align: center;"> **Colin McCornack** </p>
 
-<span style="float:center;"> colinmccornack@wustl.edu · [LinkedIn](https://linkedin.com/in/colinmccornack) · [https://colinmccornack.github.io/](https://colinmccornack.github.io/) </span>
+<p style="text-align: center;"> colinmccornack@wustl.edu · [LinkedIn](https://linkedin.com/in/colinmccornack) · [https://colinmccornack.github.io/](https://colinmccornack.github.io/) </p>
 
 ---
 
