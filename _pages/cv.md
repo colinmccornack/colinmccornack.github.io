@@ -4,9 +4,9 @@ title: CV
 permalink: /cv/
 ---
 
-**Colin McCornack** 
+<span style="float:center;"> **Colin McCornack** </span>
 
-colinmccornack@wustl.edu · [LinkedIn](https://linkedin.com/in/colinmccornack) · [https://colinmccornack.github.io/](https://colinmccornack.github.io/)
+<span style="float:center;"> colinmccornack@wustl.edu · [LinkedIn](https://linkedin.com/in/colinmccornack) · [https://colinmccornack.github.io/](https://colinmccornack.github.io/) </span>
 
 ---
 
@@ -79,6 +79,7 @@ Epigenetics*, 2025.
 ### Research Talks 
 
 - **“TE-chimeric transcripts in cancer: from bulk to single-cell”**, *ASHG Annual Meeting*, 2024
+
 ---
 
 ## Volunteering & Mentorship
