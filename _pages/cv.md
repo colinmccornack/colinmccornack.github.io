@@ -75,6 +75,7 @@ Epigenetics*, 2025.
 - **TEs in Cancer: Mechanisms of Activation and Future Clinical Applications**, *WUSM Genetics 50th Anniversary Symposium*
 
 ### Research Talks 
+
 - **“TE-chimeric transcripts in cancer: from bulk to single-cell”**, *ASHG Annual Meeting*, 2024
 ---
 
