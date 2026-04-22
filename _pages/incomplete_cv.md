@@ -1,7 +1,4 @@
----
-layout: page
-title: CV
-permalink: /cv/
+
 ---
 
 **Colin McCornack** · colinmccornack@wustl.edu · [LinkedIn](https://linkedin.com/in/colinmccornack) · [https://colinmccornack.github.io/](https://colinmccornack.github.io/)
@@ -29,6 +26,16 @@ BA - Music
 |---------------|----------------------------------------------|
 | Languages     | R, Python                |
 | Tools         | Git, Docker, VS Code                         |
+
+---
+
+## Projects
+
+**[Thesis Project](https://github.com/you/project)** <span style="float:right;">2023</span>  
+Short description of what it does and the tech stack used.
+
+**Another Project** <span style="float:right;">2022</span>  
+Description here.
 
 ---
 
