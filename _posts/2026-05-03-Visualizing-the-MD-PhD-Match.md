@@ -1,4 +1,3 @@
-2026-05-03-Visualizing-the-MD-PhD-Match
 ---
 layout: post
 title: Visualizing the MD/PhD Match 
