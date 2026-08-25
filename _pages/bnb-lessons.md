@@ -14,6 +14,7 @@ permalink: /bnb-lessons/
     <div class="bnbt-stat"><span class="bnbt-stat-label">Lessons</span><span class="bnbt-stat-value" id="bnbt-stat-lessons">–</span></div>
     <div class="bnbt-stat"><span class="bnbt-stat-label">Cards</span><span class="bnbt-stat-value" id="bnbt-stat-cards">–</span></div>
   </div>
+  <p class="bnbt-note">"Cards" is the deduplicated total across both steps. Step 1 and Step 2 totals can add up to more than this, since a card can legitimately be tagged to both.</p>
 
   <div class="bnbt-controls">
     <input type="text" id="bnbt-search" placeholder="Filter by step, subject, chapter, or lesson…" autocomplete="off">
@@ -37,6 +38,7 @@ permalink: /bnb-lessons/
 #bnbt-explorer .bnbt-controls button { padding: 0.5em 0.9em; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 0.85em; cursor: pointer; }
 #bnbt-explorer .bnbt-controls button:hover { background: #f6f6f6; }
 #bnbt-explorer .bnbt-status { color: #888; padding: 1em 0; }
+#bnbt-explorer .bnbt-note { color: #999; font-size: 0.8em; margin: -0.8em 0 1.2em; }
 
 #bnbt-tree details.step { background: #f6f6f6; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
 #bnbt-tree details.step > summary { padding: 12px 14px; font-size: 16px; font-weight: 700; }
@@ -155,9 +157,8 @@ permalink: /bnb-lessons/
       state.strings = data.s;
       state.steps = data.steps;
 
-      var subjectCount = 0, chapterCount = 0, lessonCount = 0, cardCount = 0;
+      var subjectCount = 0, chapterCount = 0, lessonCount = 0;
       state.steps.forEach(function (step) {
-        cardCount += step[1];
         step[2].forEach(function (subj) {
           subjectCount++;
           subj[2].forEach(function (chap) {
@@ -171,7 +172,7 @@ permalink: /bnb-lessons/
       els.statSubjects.textContent = subjectCount.toLocaleString();
       els.statChapters.textContent = chapterCount.toLocaleString();
       els.statLessons.textContent = lessonCount.toLocaleString();
-      els.statCards.textContent = cardCount.toLocaleString();
+      els.statCards.textContent = data.total_cards.toLocaleString();
 
       els.status.hidden = true;
       els.treeEl.hidden = false;

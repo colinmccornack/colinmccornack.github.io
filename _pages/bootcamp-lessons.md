@@ -136,9 +136,8 @@ permalink: /bootcamp-lessons/
       state.strings = data.s;
       state.subjects = data.subjects;
 
-      var chapterCount = 0, lessonCount = 0, cardCount = 0;
+      var chapterCount = 0, lessonCount = 0;
       state.subjects.forEach(function (subj) {
-        cardCount += subj[1];
         subj[2].forEach(function (chap) {
           chapterCount++;
           lessonCount += chap[2].length;
@@ -148,7 +147,7 @@ permalink: /bootcamp-lessons/
       els.statSubjects.textContent = state.subjects.length;
       els.statChapters.textContent = chapterCount.toLocaleString();
       els.statLessons.textContent = lessonCount.toLocaleString();
-      els.statCards.textContent = cardCount.toLocaleString();
+      els.statCards.textContent = data.total_cards.toLocaleString();
 
       els.status.hidden = true;
       els.treeEl.hidden = false;
