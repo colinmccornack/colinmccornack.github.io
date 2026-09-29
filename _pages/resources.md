@@ -4,7 +4,7 @@ title: Resources
 permalink: /resources/
 ---
 
-Tools, datasets, and lists that I've put together (or collected) over the years, all in one place. Each section links back to the post where I discuss it in more detail.
+Tools, datasets, and lists that I've put together (or collected) over the years
 
 * [MCAT resources](#mcat-resources)
 * [Postbacc research programs](#postbacc-research-programs)
@@ -13,17 +13,17 @@ Tools, datasets, and lists that I've put together (or collected) over the years,
 
 ## MCAT resources
 
-Free and paid materials for MCAT prep, mostly pulled from Reddit posts and comments (credits at the end of the list). For how I'd put these together into a schedule, see [Creating a study plan for the MCAT]({{ site.baseurl }}{% post_url 2025-04-20-MCAT-Study-Plan %}).
+Free and paid materials for MCAT prep, mostly pulled from Reddit posts and comments (credits at the end of the list). Original post can be found here: [Creating a study plan for the MCAT]({{ site.baseurl }}{% post_url 2025-04-20-MCAT-Study-Plan %}).
 
 {% include mcat-resources.md heading="###" %}
 
 ## Postbacc research programs
 
-A [semi-updated spreadsheet of postbacc research programs](https://docs.google.com/spreadsheets/d/1Gd_M-fJQg7LHXZulluaqGmmdmZQdZPyEJAV2fgYiYB4/edit?usp=sharing), including PREP programs and the NIH IRTA, which I plan to update in Fall 2026. Fewer than a third of the PREP programs survived the recent funding cuts. The background is in [PREP programs and the changing postbacc research pipeline]({{ site.baseurl }}{% post_url 2026-03-22-PREP-program-cuts %}).
+A [semi-updated spreadsheet of postbacc research programs](https://docs.google.com/spreadsheets/d/1Gd_M-fJQg7LHXZulluaqGmmdmZQdZPyEJAV2fgYiYB4/edit?usp=sharing), including PREP programs and the NIH IRTA, which I plan to update in Fall 2026. Fewer than a third of the PREP programs survived the recent funding cuts. Original post can be found here: [PREP programs and the changing postbacc research pipeline]({{ site.baseurl }}{% post_url 2026-03-22-PREP-program-cuts %}).
 
 ## MD/PhD Match visualization
 
-An [interactive chart](https://crmcc.shinyapps.io/mdphd_sankey/) of how many MD/PhD graduates are training in each ACGME specialty, from 2016 to 2024, built from the AAMC Report on Residents (Table B4). The [combined data table](https://docs.google.com/spreadsheets/d/1J4K8jrtcZGh5sfINoER7WhcENUjd57EAxHsJ1qA1E0c/edit?usp=sharing) is also available. The chart is embedded in [Visualizing the MD/PhD Match]({{ site.baseurl }}{% post_url 2026-05-03-Visualizing-the-MD-PhD-Match %}).
+An [interactive chart](https://crmcc.shinyapps.io/mdphd_sankey/) of how many MD/PhD graduates are training in each ACGME specialty, from 2016 to 2024, built from the AAMC Report on Residents (Table B4). The [combined data table](https://docs.google.com/spreadsheets/d/1J4K8jrtcZGh5sfINoER7WhcENUjd57EAxHsJ1qA1E0c/edit?usp=sharing) is also available. Original post can be found here: [Visualizing the MD/PhD Match]({{ site.baseurl }}{% post_url 2026-05-03-Visualizing-the-MD-PhD-Match %}).
 
 ## Anki Step 1 & 2 tag explorers
 
