@@ -1,0 +1,150 @@
+{% comment %}
+  Collapsible subject -> chapter -> lesson explorer for a single Anki resource.
+  Parameters:
+    data  path to the JSON under /assets/data/ (built by scripts_and_data/scripts/build_anki_trees.py)
+    sub   intro sentence shown above the stats (HTML allowed)
+  JSON shape: {"s": [strings], "subjects": [node], "total_cards": n}, node = [name_index, count, children?].
+  Tags that stop above lesson level show up as leaves higher in the tree.
+{% endcomment %}
+<div id="atx-explorer">
+  <p class="atx-sub">{{ include.sub }}</p>
+
+  <div class="atx-stats">
+    <div class="atx-stat"><span class="atx-stat-label">Subjects</span><span class="atx-stat-value" id="atx-stat-subjects">–</span></div>
+    <div class="atx-stat"><span class="atx-stat-label">Lessons</span><span class="atx-stat-value" id="atx-stat-lessons">–</span></div>
+    <div class="atx-stat"><span class="atx-stat-label">Cards</span><span class="atx-stat-value" id="atx-stat-cards">–</span></div>
+  </div>
+  <p class="atx-note">Counts are unique cards: a card tagged to two lessons in the same chapter counts once for the chapter.</p>
+
+  <div class="atx-controls">
+    <input type="text" id="atx-search" placeholder="Filter by subject, chapter, or lesson…" autocomplete="off">
+    <button id="atx-expand-all">Expand all</button>
+    <button id="atx-collapse-all">Collapse all</button>
+  </div>
+
+  <div id="atx-status" class="atx-status">Loading…</div>
+  <div id="atx-tree" hidden></div>
+</div>
+
+<style>
+#atx-explorer { max-width: 800px; margin: 0 auto; }
+#atx-explorer .atx-sub { color: #666; font-size: 0.95em; margin-bottom: 1.2em; }
+#atx-explorer .atx-stats { display: flex; gap: 12px; margin-bottom: 1.2em; flex-wrap: wrap; }
+#atx-explorer .atx-stat { background: #f6f6f6; border-radius: 6px; padding: 0.6em 1em; flex: 1; min-width: 80px; }
+#atx-explorer .atx-stat-label { display: block; font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 0.03em; }
+#atx-explorer .atx-stat-value { display: block; font-size: 1.3em; font-weight: 600; font-variant-numeric: tabular-nums; }
+#atx-explorer .atx-note { color: #999; font-size: 0.8em; margin: -0.8em 0 1.2em; }
+#atx-explorer .atx-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1em; }
+#atx-explorer #atx-search { flex: 1; min-width: 180px; padding: 0.5em 0.7em; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95em; }
+#atx-explorer .atx-controls button { padding: 0.5em 0.9em; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 0.85em; cursor: pointer; }
+#atx-explorer .atx-controls button:hover { background: #f6f6f6; }
+#atx-explorer .atx-status { color: #888; padding: 1em 0; }
+
+#atx-tree details.lvl0 { background: #f6f6f6; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+#atx-tree details.lvl0 > summary { padding: 12px 14px; font-size: 16px; font-weight: 700; }
+#atx-tree details.lvl0 > div { padding: 0 10px 8px; }
+#atx-tree details.lvl1 { border-bottom: 1px solid #eee; }
+#atx-tree details.lvl1:last-child { border-bottom: none; }
+#atx-tree details.lvl1 > summary { padding: 10px 4px; font-size: 15px; font-weight: 600; }
+#atx-tree summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 8px; }
+#atx-tree summary::-webkit-details-marker { display: none; }
+#atx-tree summary > span:first-child::before { content: "▸"; display: inline-block; margin-right: 8px; font-size: 11px; color: #999; transition: transform 0.15s ease; }
+#atx-tree details[open] > summary > span:first-child::before { transform: rotate(90deg); }
+#atx-tree .atx-count { color: #999; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 0.85em; }
+#atx-tree .atx-leaf { display: flex; justify-content: space-between; gap: 8px; padding: 5px 4px 5px 16px; border-left: 1px solid #ddd; margin-left: 4px; font-size: 13px; color: #555; }
+/* Subject-only tags: styled like a subject row, indented to line up with the ▸ on expandable rows */
+#atx-tree > .atx-leaf { background: #f6f6f6; border: none; border-radius: 8px; margin: 0 0 12px; padding: 12px 14px 12px 28px; font-size: 16px; font-weight: 700; color: inherit; }
+#atx-tree details.lvl1 > div > .atx-leaf { margin-left: 4px; }
+</style>
+
+<script>
+(function () {
+  var DATA_URL = "{{ include.data | prepend: '/assets/data/' | relative_url }}";
+  var data = null;
+
+  var els = {
+    status: document.getElementById('atx-status'),
+    treeEl: document.getElementById('atx-tree'),
+    search: document.getElementById('atx-search'),
+    expandAll: document.getElementById('atx-expand-all'),
+    collapseAll: document.getElementById('atx-collapse-all'),
+    statSubjects: document.getElementById('atx-stat-subjects'),
+    statLessons: document.getElementById('atx-stat-lessons'),
+    statCards: document.getElementById('atx-stat-cards'),
+  };
+
+  function s(i) { return data.s[i]; }
+  function esc(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function fmt(n) { return n.toLocaleString(); }
+
+  // Leaves carry their full path so filtering on a subject or chapter name matches everything under it
+  function renderNode(node, depth, path) {
+    var name = s(node[0]), cnt = node[1], kids = node[2];
+    var text = path.concat(name);
+    if (!kids) {
+      return '<div class="atx-leaf" data-text="' + esc(text.join(' ').toLowerCase()) + '"><span>' + esc(name) + '</span><span class="atx-count">' + fmt(cnt) + '</span></div>';
+    }
+    return '<details class="' + (depth === 0 ? 'lvl0' : 'lvl1') + '"><summary><span>' + esc(name) + '</span>' +
+      '<span class="atx-count">' + fmt(cnt) + '</span></summary><div>' +
+      kids.map(function (k) { return renderNode(k, depth + 1, text); }).join('') + '</div></details>';
+  }
+
+  function countLeaves(nodes) {
+    return nodes.reduce(function (n, node) { return n + (node[2] ? countLeaves(node[2]) : 1); }, 0);
+  }
+
+  // Returns true if anything under el is visible
+  function filterEl(el, q) {
+    if (el.classList.contains('atx-leaf')) {
+      var match = el.getAttribute('data-text').indexOf(q) !== -1;
+      el.style.display = match ? 'flex' : 'none';
+      return match;
+    }
+    var any = false;
+    Array.prototype.forEach.call(el.querySelector(':scope > div').children, function (child) {
+      if (filterEl(child, q)) any = true;
+    });
+    el.style.display = any ? '' : 'none';
+    el.open = any;
+    return any;
+  }
+
+  els.search.addEventListener('input', function () {
+    var q = els.search.value.trim().toLowerCase();
+    if (!q) {
+      els.treeEl.querySelectorAll('.atx-leaf').forEach(function (li) { li.style.display = 'flex'; });
+      els.treeEl.querySelectorAll('details').forEach(function (d) { d.style.display = ''; d.open = false; });
+      return;
+    }
+    Array.prototype.forEach.call(els.treeEl.children, function (child) { filterEl(child, q); });
+  });
+  els.expandAll.addEventListener('click', function () {
+    els.treeEl.querySelectorAll('details').forEach(function (d) { d.open = true; });
+  });
+  els.collapseAll.addEventListener('click', function () {
+    els.treeEl.querySelectorAll('details').forEach(function (d) { d.open = false; });
+  });
+
+  fetch(DATA_URL)
+    .then(function (res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    })
+    .then(function (d) {
+      data = d;
+      els.statSubjects.textContent = fmt(data.subjects.length);
+      els.statLessons.textContent = fmt(countLeaves(data.subjects));
+      els.statCards.textContent = fmt(data.total_cards);
+      els.treeEl.innerHTML = data.subjects.map(function (n) { return renderNode(n, 0, []); }).join('');
+      els.status.hidden = true;
+      els.treeEl.hidden = false;
+    })
+    .catch(function (err) {
+      els.status.textContent = 'Could not load lesson data (' + err.message + '). Check that {{ include.data }} is in /assets/data/.';
+    });
+})();
+</script>

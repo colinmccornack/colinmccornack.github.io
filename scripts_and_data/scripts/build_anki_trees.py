@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""Build the JSON data for the Step 2 B&B and Shelf lesson explorer pages.
+"""Build the JSON data for the Anki lesson explorer pages.
 
 Inputs are tab-separated card exports from the Anki browser (Sort Field, Card,
-Due, Deck, Note, Tags), one row per card.
+Due, Deck, Note, Tags), one row per card. Each input is optional, so a single
+page's data can be rebuilt on its own.
 
     python3 build_anki_trees.py \
         --step2-bnb "Step2_B&B_no_Step1Step2_Overlap.csv" \
         --shelf "Shelf_tag.csv" \
+        --sketchy-pharm "Step1&2_SketchyPharm.csv" \
+        --sketchy-micro "Step1&2Overlap_SketchyMicro.csv" \
         --out ../../assets/data
 
 Writes:
   bnb-step2-only-lessons.json  same shape as bnb-lessons.json (Step 2 only)
   shelf-lessons.json           per-shelf totals plus B&B and OME trees per shelf
+  sketchy-pharm-lessons.json   Sketchy Pharm subject -> chapter -> lesson tree
+  sketchy-micro-lessons.json   Sketchy Micro subject -> chapter -> lesson tree
 
 Every count is the number of unique cards in that node's subtree, so a card
 tagged to two lessons in the same chapter counts once for the chapter.
@@ -25,6 +30,8 @@ from collections import defaultdict
 
 BNB_STEP2 = "#AK_Step2_v12::#B&B::"
 OME_STEP2 = "#AK_Step2_v12::#OME::"
+SKETCHY_PHARM = "#AK_Step1_v12::#SketchyPharm::"
+SKETCHY_MICRO = "#AK_Step1_v12::#SketchyMicro::"
 SHELF = "#AK_Step2_v12::!Shelf::"
 SHELF_SKIP = ("#Cards_AnKing_Did", "#Cards_AnKing_Skipped")
 OME_SKIP = ("Removed",)
@@ -62,6 +69,17 @@ def ome_paths(tags):
                 parts = parts[1:]
             if parts and parts[0] not in OME_SKIP:
                 yield tuple(parts)
+
+
+def resource_paths(prefix):
+    """Tags under prefix as (subject, chapter, lesson) paths. Deeper levels like ::zanki_extra stay in the
+    lesson name; tags that stop at the subject or chapter keep their shorter path."""
+    def get(tags):
+        for t in tags:
+            if t.startswith(prefix):
+                parts = t[len(prefix):].split("::")
+                yield tuple(parts[:2] + ["::".join(parts[2:])]) if len(parts) > 3 else tuple(parts)
+    return get
 
 
 def shelves_of(tags):
@@ -123,6 +141,14 @@ def build_step2_bnb(cards):
     return {"s": strings.list, "steps": [step], "total_cards": len(paths)}
 
 
+def build_resource(cards, prefix):
+    strings = Strings()
+    get_paths = resource_paths(prefix)
+    paths = {i: list(get_paths(tags)) for i, tags in enumerate(cards)}
+    paths = {i: p for i, p in paths.items() if p}
+    return {"s": strings.list, "subjects": build_tree(paths, strings), "total_cards": len(paths)}
+
+
 def build_shelf(cards):
     strings = Strings()
     shelf_cards = defaultdict(set)
@@ -152,24 +178,39 @@ def build_shelf(cards):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--step2-bnb", required=True, help="export of Step 2 B&B cards without the Step 1&2 overlap tag")
-    ap.add_argument("--shelf", required=True, help="export of cards with a Step 2 !Shelf tag")
+    ap.add_argument("--step2-bnb", help="export of Step 2 B&B cards without the Step 1&2 overlap tag")
+    ap.add_argument("--shelf", help="export of cards with a Step 2 !Shelf tag")
+    ap.add_argument("--sketchy-pharm", help="export of Step 1&2 overlap cards with a Sketchy Pharm tag")
+    ap.add_argument("--sketchy-micro", help="export of Step 1&2 overlap cards with a Sketchy Micro tag")
     ap.add_argument("--out", required=True, help="output directory (assets/data)")
     args = ap.parse_args()
 
-    step2 = build_step2_bnb(load_cards(args.step2_bnb))
-    shelf = build_shelf(load_cards(args.shelf))
-
-    for name, data in (("bnb-step2-only-lessons.json", step2), ("shelf-lessons.json", shelf)):
+    def write(name, data):
         with open(os.path.join(args.out, name), "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
-    print(f"Step 2 B&B (no overlap): {step2['total_cards']} cards")
-    print(f"Shelf: {shelf['total_cards']} cards")
-    for (si, n) in shelf["shelves"]:
-        print(f"  {shelf['s'][si]}: {n}")
-    for key, t in shelf["trees"].items():
-        print(f"  {t['label']}-tagged: {t['tagged_cards']}")
+    if args.step2_bnb:
+        step2 = build_step2_bnb(load_cards(args.step2_bnb))
+        write("bnb-step2-only-lessons.json", step2)
+        print(f"Step 2 B&B (no overlap): {step2['total_cards']} cards")
+
+    if args.shelf:
+        shelf = build_shelf(load_cards(args.shelf))
+        write("shelf-lessons.json", shelf)
+        print(f"Shelf: {shelf['total_cards']} cards")
+        for (si, n) in shelf["shelves"]:
+            print(f"  {shelf['s'][si]}: {n}")
+        for key, t in shelf["trees"].items():
+            print(f"  {t['label']}-tagged: {t['tagged_cards']}")
+
+    for path, prefix, name, label in (
+        (args.sketchy_pharm, SKETCHY_PHARM, "sketchy-pharm-lessons.json", "Sketchy Pharm"),
+        (args.sketchy_micro, SKETCHY_MICRO, "sketchy-micro-lessons.json", "Sketchy Micro"),
+    ):
+        if path:
+            data = build_resource(load_cards(path), prefix)
+            write(name, data)
+            print(f"{label}: {data['total_cards']} cards")
 
 
 if __name__ == "__main__":

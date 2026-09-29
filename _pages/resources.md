@@ -32,6 +32,8 @@ Card counts from the AnKing Step deck for cards tagged `#AK_Other::Only_Step_1&2
 * [Boards & Beyond lessons]({{ site.baseurl }}/bnb-lessons/): cards per step, subject, chapter, and lesson
 * [Bootcamp lessons]({{ site.baseurl }}/bootcamp-lessons/): cards per subject, chapter, and lesson
 * [Bootcamp × B&B overlap]({{ site.baseurl }}/bootcamp-bnb-overlap/): lesson pairs that share cards between the two resources
+* [Sketchy Pharm lessons]({{ site.baseurl }}/sketchy-pharm-lessons/): cards per subject, chapter, and lesson
+* [Sketchy Micro lessons]({{ site.baseurl }}/sketchy-micro-lessons/): cards per subject, chapter, and lesson
 
 Beyond the Step 1&2 overlap:
 
