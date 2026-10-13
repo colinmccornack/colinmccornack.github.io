@@ -1,23 +1,29 @@
 {% comment %}
   Collapsible subject -> chapter -> lesson explorer for a single Anki resource.
   Parameters:
-    data  path to the JSON under /assets/data/ (built by scripts_and_data/scripts/build_anki_trees.py)
-    sub   intro sentence shown above the stats (HTML allowed)
+    data         path to the JSON under /assets/data/ (built by scripts_and_data/scripts/build_anki_trees.py)
+    sub          intro sentence shown above the stats (HTML allowed)
+    top_label    name of the top level in the stats row (default "Subjects")
+    leaf_label   name of the lowest level in the stats row (default "Lessons"); "none" hides that tile
+    placeholder  filter box placeholder
   JSON shape: {"s": [strings], "subjects": [node], "total_cards": n}, node = [name_index, count, children?].
   Tags that stop above lesson level show up as leaves higher in the tree.
+  For several switchable trees, use "views": [{"label", "top_label", "leaf_label", "cards", "nodes"}] in place of "subjects".
 {% endcomment %}
 <div id="atx-explorer">
   <p class="atx-sub">{{ include.sub }}</p>
 
   <div class="atx-stats">
-    <div class="atx-stat"><span class="atx-stat-label">Subjects</span><span class="atx-stat-value" id="atx-stat-subjects">–</span></div>
-    <div class="atx-stat"><span class="atx-stat-label">Lessons</span><span class="atx-stat-value" id="atx-stat-lessons">–</span></div>
+    <div class="atx-stat"><span class="atx-stat-label" id="atx-label-top">{{ include.top_label | default: "Subjects" }}</span><span class="atx-stat-value" id="atx-stat-subjects">–</span></div>
+    <div class="atx-stat" id="atx-tile-leaves"{% if include.leaf_label == "none" %} hidden{% endif %}><span class="atx-stat-label" id="atx-label-leaves">{{ include.leaf_label | default: "Lessons" }}</span><span class="atx-stat-value" id="atx-stat-lessons">–</span></div>
     <div class="atx-stat"><span class="atx-stat-label">Cards</span><span class="atx-stat-value" id="atx-stat-cards">–</span></div>
   </div>
-  <p class="atx-note">Counts are unique cards: a card tagged to two lessons in the same chapter counts once for the chapter.</p>
+  <p class="atx-note">Counts are unique cards: a card tagged in two places under the same heading counts once for that heading.</p>
+
+  <div class="atx-toggle" id="atx-toggle" role="tablist" aria-label="View" hidden></div>
 
   <div class="atx-controls">
-    <input type="text" id="atx-search" placeholder="Filter by subject, chapter, or lesson…" autocomplete="off">
+    <input type="text" id="atx-search" placeholder="{{ include.placeholder | default: "Filter by subject, chapter, or lesson…" }}" autocomplete="off">
     <button id="atx-expand-all">Expand all</button>
     <button id="atx-collapse-all">Collapse all</button>
   </div>
@@ -34,6 +40,11 @@
 #atx-explorer .atx-stat-label { display: block; font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 0.03em; }
 #atx-explorer .atx-stat-value { display: block; font-size: 1.3em; font-weight: 600; font-variant-numeric: tabular-nums; }
 #atx-explorer .atx-note { color: #999; font-size: 0.8em; margin: -0.8em 0 1.2em; }
+#atx-explorer .atx-toggle { display: inline-flex; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; margin-bottom: 1em; }
+#atx-explorer .atx-toggle[hidden] { display: none; }
+#atx-explorer .atx-toggle button { padding: 0.5em 1em; border: none; background: #fff; font-size: 0.9em; cursor: pointer; }
+#atx-explorer .atx-toggle button + button { border-left: 1px solid #ddd; }
+#atx-explorer .atx-toggle button[aria-selected="true"] { background: #404040; color: #fff; }
 #atx-explorer .atx-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1em; }
 #atx-explorer #atx-search { flex: 1; min-width: 180px; padding: 0.5em 0.7em; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95em; }
 #atx-explorer .atx-controls button { padding: 0.5em 0.9em; border: 1px solid #ddd; border-radius: 6px; background: #fff; font-size: 0.85em; cursor: pointer; }
@@ -46,6 +57,8 @@
 #atx-tree details.lvl1 { border-bottom: 1px solid #eee; }
 #atx-tree details.lvl1:last-child { border-bottom: none; }
 #atx-tree details.lvl1 > summary { padding: 10px 4px; font-size: 15px; font-weight: 600; }
+#atx-tree details.deep > summary { padding: 7px 4px 7px 16px; font-size: 14px; border-left: 1px solid #ddd; margin-left: 4px; }
+#atx-tree details.deep > div { padding-left: 16px; }
 #atx-tree summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 8px; }
 #atx-tree summary::-webkit-details-marker { display: none; }
 #atx-tree summary > span:first-child::before { content: "▸"; display: inline-block; margin-right: 8px; font-size: 11px; color: #999; transition: transform 0.15s ease; }
@@ -60,7 +73,7 @@
 <script>
 (function () {
   var DATA_URL = "{{ include.data | prepend: '/assets/data/' | relative_url }}";
-  var data = null;
+  var data = null, views = [], current = 0;
 
   var els = {
     status: document.getElementById('atx-status'),
@@ -71,6 +84,10 @@
     statSubjects: document.getElementById('atx-stat-subjects'),
     statLessons: document.getElementById('atx-stat-lessons'),
     statCards: document.getElementById('atx-stat-cards'),
+    labelTop: document.getElementById('atx-label-top'),
+    labelLeaves: document.getElementById('atx-label-leaves'),
+    tileLeaves: document.getElementById('atx-tile-leaves'),
+    toggle: document.getElementById('atx-toggle'),
   };
 
   function s(i) { return data.s[i]; }
@@ -88,7 +105,7 @@
     if (!kids) {
       return '<div class="atx-leaf" data-text="' + esc(text.join(' ').toLowerCase()) + '"><span>' + esc(name) + '</span><span class="atx-count">' + fmt(cnt) + '</span></div>';
     }
-    return '<details class="' + (depth === 0 ? 'lvl0' : 'lvl1') + '"><summary><span>' + esc(name) + '</span>' +
+    return '<details class="' + (depth === 0 ? 'lvl0' : depth === 1 ? 'lvl1' : 'deep') + '"><summary><span>' + esc(name) + '</span>' +
       '<span class="atx-count">' + fmt(cnt) + '</span></summary><div>' +
       kids.map(function (k) { return renderNode(k, depth + 1, text); }).join('') + '</div></details>';
   }
@@ -113,7 +130,7 @@
     return any;
   }
 
-  els.search.addEventListener('input', function () {
+  function applyFilter() {
     var q = els.search.value.trim().toLowerCase();
     if (!q) {
       els.treeEl.querySelectorAll('.atx-leaf').forEach(function (li) { li.style.display = 'flex'; });
@@ -121,7 +138,22 @@
       return;
     }
     Array.prototype.forEach.call(els.treeEl.children, function (child) { filterEl(child, q); });
-  });
+  }
+
+  function render() {
+    var view = views[current];
+    if (view.top_label) els.labelTop.textContent = view.top_label;
+    var leafLabel = view.leaf_label === undefined ? els.labelLeaves.textContent : view.leaf_label;
+    els.tileLeaves.hidden = !leafLabel || leafLabel === 'none';
+    els.labelLeaves.textContent = leafLabel;
+    els.statSubjects.textContent = fmt(view.nodes.length);
+    els.statLessons.textContent = fmt(countLeaves(view.nodes));
+    els.statCards.textContent = fmt(view.cards);
+    els.treeEl.innerHTML = view.nodes.map(function (n) { return renderNode(n, 0, []); }).join('');
+    if (els.search.value.trim()) applyFilter();
+  }
+
+  els.search.addEventListener('input', applyFilter);
   els.expandAll.addEventListener('click', function () {
     els.treeEl.querySelectorAll('details').forEach(function (d) { d.open = true; });
   });
@@ -136,10 +168,21 @@
     })
     .then(function (d) {
       data = d;
-      els.statSubjects.textContent = fmt(data.subjects.length);
-      els.statLessons.textContent = fmt(countLeaves(data.subjects));
-      els.statCards.textContent = fmt(data.total_cards);
-      els.treeEl.innerHTML = data.subjects.map(function (n) { return renderNode(n, 0, []); }).join('');
+      views = data.views || [{ nodes: data.subjects, cards: data.total_cards }];
+      if (views.length > 1) {
+        els.toggle.innerHTML = views.map(function (v, i) {
+          return '<button type="button" role="tab" data-view="' + i + '" aria-selected="' + (i === 0) + '">' + esc(v.label) + '</button>';
+        }).join('');
+        els.toggle.hidden = false;
+        els.toggle.addEventListener('click', function (e) {
+          var btn = e.target.closest('button');
+          if (!btn) return;
+          current = +btn.getAttribute('data-view');
+          els.toggle.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-selected', b === btn ? 'true' : 'false'); });
+          render();
+        });
+      }
+      render();
       els.status.hidden = true;
       els.treeEl.hidden = false;
     })

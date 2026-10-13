@@ -6,10 +6,12 @@ Due, Deck, Note, Tags), one row per card. Each input is optional, so a single
 page's data can be rebuilt on its own.
 
     python3 build_anki_trees.py \
-        --step2-bnb "Step2_B&B_no_Step1Step2_Overlap.csv" \
+        --step2-bnb "Anking_step_No_Only_Step1.csv" \
         --shelf "Shelf_tag.csv" \
         --sketchy-pharm "Step1&2_SketchyPharm.csv" \
         --sketchy-micro "Step1&2Overlap_SketchyMicro.csv" \
+        --surgical-recall "Surgical_Recall.csv" \
+        --light-year-ent "CrabsMcChaffey_LY_ENT.csv" \
         --out ../../assets/data
 
 Writes:
@@ -17,6 +19,8 @@ Writes:
   shelf-lessons.json           per-shelf totals plus B&B and OME trees per shelf
   sketchy-pharm-lessons.json   Sketchy Pharm subject -> chapter -> lesson tree
   sketchy-micro-lessons.json   Sketchy Micro subject -> chapter -> lesson tree
+  surgical-recall-chapters.json  Surgical Recall chapter -> subsection tree
+  light-year-ent.json          Light Year ENT deck by Pasha chapter and by specialty
 
 Every count is the number of unique cards in that node's subtree, so a card
 tagged to two lessons in the same chapter counts once for the chapter.
@@ -32,6 +36,9 @@ BNB_STEP2 = "#AK_Step2_v12::#B&B::"
 OME_STEP2 = "#AK_Step2_v12::#OME::"
 SKETCHY_PHARM = "#AK_Step1_v12::#SketchyPharm::"
 SKETCHY_MICRO = "#AK_Step1_v12::#SketchyMicro::"
+SURGICAL_RECALL = "Surgical_Recall::"
+ENT_PASHA = "Crabs::Pasha::"
+ENT_SPECIALTY = "Crabs::Specialty::"
 SHELF = "#AK_Step2_v12::!Shelf::"
 SHELF_SKIP = ("#Cards_AnKing_Did", "#Cards_AnKing_Skipped")
 OME_SKIP = ("Removed",)
@@ -88,8 +95,8 @@ def shelves_of(tags):
 
 def sort_key(name):
     # Numbered names sort by their number; the rest alphabetically after them
-    m = re.match(r"(\d+)_", name)
-    return (0, int(m.group(1)), name) if m else (1, 0, name.lower())
+    m = re.match(r"(?:(\d+)_|Chapter(\d+))", name)
+    return (0, int(m.group(1) or m.group(2)), name) if m else (1, 0, name.lower())
 
 
 class Strings:
@@ -141,12 +148,37 @@ def build_step2_bnb(cards):
     return {"s": strings.list, "steps": [step], "total_cards": len(paths)}
 
 
-def build_resource(cards, prefix):
+def build_resource(cards, prefix, top_by_count=True):
     strings = Strings()
     get_paths = resource_paths(prefix)
     paths = {i: list(get_paths(tags)) for i, tags in enumerate(cards)}
     paths = {i: p for i, p in paths.items() if p}
-    return {"s": strings.list, "subjects": build_tree(paths, strings), "total_cards": len(paths)}
+    return {"s": strings.list, "subjects": build_tree(paths, strings, top_by_count), "total_cards": len(paths)}
+
+
+def build_light_year_ent(cards):
+    """Two views of the deck: Pasha chapter -> section, and specialty -> Pasha chapter -> section.
+    A specialty's own count is every card with that specialty tag, including ones without a Pasha tag."""
+    strings = Strings()
+    pasha_paths = resource_paths(ENT_PASHA)
+    by_chapter, by_specialty = {}, {}
+    for i, tags in enumerate(cards):
+        chapters = list(pasha_paths(tags))
+        specialties = [t[len(ENT_SPECIALTY):] for t in tags if t.startswith(ENT_SPECIALTY)]
+        if chapters:
+            by_chapter[i] = chapters
+        if specialties:
+            by_specialty[i] = [(s,) + c for s in specialties for c in chapters or [()]]
+    return {
+        "s": strings.list,
+        "total_cards": len(set(by_chapter) | set(by_specialty)),
+        "views": [
+            {"label": "By Pasha chapter", "top_label": "Chapters", "leaf_label": "Sections",
+             "cards": len(by_chapter), "nodes": build_tree(by_chapter, strings, top_by_count=False)},
+            {"label": "By specialty", "top_label": "Specialties", "leaf_label": "",
+             "cards": len(by_specialty), "nodes": build_tree(by_specialty, strings)},
+        ],
+    }
 
 
 def build_shelf(cards):
@@ -178,10 +210,12 @@ def build_shelf(cards):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--step2-bnb", help="export of Step 2 B&B cards without the Step 1&2 overlap tag")
+    ap.add_argument("--step2-bnb", help="export of AnKing Step deck cards without the Only_Step_1 tag")
     ap.add_argument("--shelf", help="export of cards with a Step 2 !Shelf tag")
     ap.add_argument("--sketchy-pharm", help="export of Step 1&2 overlap cards with a Sketchy Pharm tag")
     ap.add_argument("--sketchy-micro", help="export of Step 1&2 overlap cards with a Sketchy Micro tag")
+    ap.add_argument("--surgical-recall", help="export of the Surgical Recall deck")
+    ap.add_argument("--light-year-ent", help="export of the CrabsMcChaffey Light Year ENT deck")
     ap.add_argument("--out", required=True, help="output directory (assets/data)")
     args = ap.parse_args()
 
@@ -192,7 +226,7 @@ def main():
     if args.step2_bnb:
         step2 = build_step2_bnb(load_cards(args.step2_bnb))
         write("bnb-step2-only-lessons.json", step2)
-        print(f"Step 2 B&B (no overlap): {step2['total_cards']} cards")
+        print(f"Step 2 B&B (no Step 1-only cards): {step2['total_cards']} cards")
 
     if args.shelf:
         shelf = build_shelf(load_cards(args.shelf))
@@ -211,6 +245,19 @@ def main():
             data = build_resource(load_cards(path), prefix)
             write(name, data)
             print(f"{label}: {data['total_cards']} cards")
+
+
+    if args.surgical_recall:
+        data = build_resource(load_cards(args.surgical_recall), SURGICAL_RECALL, top_by_count=False)
+        write("surgical-recall-chapters.json", data)
+        print(f"Surgical Recall: {data['total_cards']} cards")
+
+    if args.light_year_ent:
+        data = build_light_year_ent(load_cards(args.light_year_ent))
+        write("light-year-ent.json", data)
+        print(f"Light Year ENT: {data['total_cards']} cards")
+        for v in data["views"]:
+            print(f"  {v['label']}: {v['cards']}")
 
 
 if __name__ == "__main__":

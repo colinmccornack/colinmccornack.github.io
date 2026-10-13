@@ -37,8 +37,13 @@ Card counts from the AnKing Step deck for cards tagged `#AK_Other::Only_Step_1&2
 
 Beyond the Step 1&2 overlap:
 
-* [Step 2 B&B lessons, no Step 1 overlap]({{ site.baseurl }}/bnb-step2-only-lessons/): Step 2 Boards & Beyond cards that aren't tagged as Step 1&2 overlap
+* [Step 2 B&B lessons, no Step 1-only cards]({{ site.baseurl }}/bnb-step2-only-lessons/): Step 2 Boards & Beyond cards, excluding those tagged as Step 1 only
 * [Shelf exam lessons]({{ site.baseurl }}/shelf-lessons/): total cards per shelf exam, broken down by Boards & Beyond or OnlineMedEd lesson
+
+Other decks:
+
+* [Surgical Recall chapters]({{ site.baseurl }}/surgical-recall-chapters/): cards per chapter and subsection of the Surgical Recall deck
+* [Light Year ENT deck]({{ site.baseurl }}/light-year-ent/): cards per Pasha chapter and per specialty in the CrabsMcChaffey Light Year ENT deck
 
 Raw exports and the script to regenerate them:
 

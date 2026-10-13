@@ -1,11 +1,11 @@
 ---
 layout: page
-title: Step 2 Boards &amp; Beyond Lessons (No Step 1 Overlap)
+title: Step 2 Boards &amp; Beyond Lessons (No Step 1-Only Cards)
 permalink: /bnb-step2-only-lessons/
 ---
 
 <div id="bnbt-explorer">
-  <p class="bnbt-sub">Subject &rarr; chapter &rarr; lesson for Step 2 Boards &amp; Beyond, counting only cards <em>without</em> the <code>#AK_Other::Only_Step_1&amp;2_Overlap</code> tag, i.e. the Step 2 material you wouldn't have seen for Step 1. For the overlap cards, see the <a href="{{ '/bnb-lessons/' | relative_url }}">Boards &amp; Beyond lessons</a> page.</p>
+  <p class="bnbt-sub">Subject &rarr; chapter &rarr; lesson for Step 2 Boards &amp; Beyond, counting every card <em>except</em> those tagged <code>#AK_Other::Only_Step_1</code>, i.e. the Step 1&amp;2 overlap cards plus the Step 2-only cards. For the overlap cards on their own, see the <a href="{{ '/bnb-lessons/' | relative_url }}">Boards &amp; Beyond lessons</a> page.</p>
 
   <div class="bnbt-stats">
     <div class="bnbt-stat"><span class="bnbt-stat-label">Subjects</span><span class="bnbt-stat-value" id="bnbt-stat-subjects">–</span></div>
