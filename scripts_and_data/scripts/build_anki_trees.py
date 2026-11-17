@@ -7,6 +7,8 @@ page's data can be rebuilt on its own.
 
     python3 build_anki_trees.py \
         --step2-bnb "Anking_step_No_Only_Step1.csv" \
+        --step1-bnb "B&B_Step1_no_Only_Step1.csv" \
+        --step1-bootcamp "Bootcamp_Step1_no_OnlyStep1.csv" \
         --shelf "Shelf_tag.csv" \
         --sketchy-pharm "Step1&2_SketchyPharm.csv" \
         --sketchy-micro "Step1&2Overlap_SketchyMicro.csv" \
@@ -16,6 +18,8 @@ page's data can be rebuilt on its own.
 
 Writes:
   bnb-step2-only-lessons.json  same shape as bnb-lessons.json (Step 2 only)
+  bnb-step1-lessons.json       same shape as bnb-lessons.json (Step 1 only)
+  bootcamp-step1-lessons.json  Step 1 Bootcamp subject -> chapter -> lesson tree
   shelf-lessons.json           per-shelf totals plus B&B and OME trees per shelf
   sketchy-pharm-lessons.json   Sketchy Pharm subject -> chapter -> lesson tree
   sketchy-micro-lessons.json   Sketchy Micro subject -> chapter -> lesson tree
@@ -32,7 +36,9 @@ import os
 import re
 from collections import defaultdict
 
+BNB_STEP1 = "#AK_Step1_v12::#B&B::"
 BNB_STEP2 = "#AK_Step2_v12::#B&B::"
+BOOTCAMP_STEP1 = "#AK_Step1_v12::#Bootcamp::"
 OME_STEP2 = "#AK_Step2_v12::#OME::"
 SKETCHY_PHARM = "#AK_Step1_v12::#SketchyPharm::"
 SKETCHY_MICRO = "#AK_Step1_v12::#SketchyMicro::"
@@ -55,13 +61,18 @@ def load_cards(path):
     return [set(r[tags_col].split()) for r in rows[header_i + 1:] if len(r) > tags_col]
 
 
-def bnb_paths(tags):
-    """Step 2 B&B tags as (subject, chapter, lesson); deeper levels like ::Extra stay in the lesson name."""
-    for t in tags:
-        if t.startswith(BNB_STEP2):
-            parts = t[len(BNB_STEP2):].split("::")
-            if len(parts) >= 3:
-                yield (parts[0], parts[1], "::".join(parts[2:]))
+def bnb_step_paths(prefix):
+    """B&B tags under prefix as (subject, chapter, lesson); deeper levels like ::Extra stay in the lesson name."""
+    def get(tags):
+        for t in tags:
+            if t.startswith(prefix):
+                parts = t[len(prefix):].split("::")
+                if len(parts) >= 3:
+                    yield (parts[0], parts[1], "::".join(parts[2:]))
+    return get
+
+
+bnb_paths = bnb_step_paths(BNB_STEP2)
 
 
 def ome_paths(tags):
@@ -139,12 +150,13 @@ def build_tree(card_paths, strings, top_by_count=True):
     return emit(root, top_by_count)
 
 
-def build_step2_bnb(cards):
+def build_bnb_step(cards, prefix=BNB_STEP2, step_label="Step 2"):
     strings = Strings()
-    paths = {i: list(bnb_paths(tags)) for i, tags in enumerate(cards)}
+    get_paths = bnb_step_paths(prefix)
+    paths = {i: list(get_paths(tags)) for i, tags in enumerate(cards)}
     paths = {i: p for i, p in paths.items() if p}
     subjects = build_tree(paths, strings)
-    step = [strings("Step 2"), len(paths), subjects]
+    step = [strings(step_label), len(paths), subjects]
     return {"s": strings.list, "steps": [step], "total_cards": len(paths)}
 
 
@@ -211,6 +223,8 @@ def build_shelf(cards):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--step2-bnb", help="export of AnKing Step deck cards without the Only_Step_1 tag")
+    ap.add_argument("--step1-bnb", help="export of Step 1 B&B cards without the Only_Step_1 tag")
+    ap.add_argument("--step1-bootcamp", help="export of Step 1 Bootcamp cards without the Only_Step_1 tag")
     ap.add_argument("--shelf", help="export of cards with a Step 2 !Shelf tag")
     ap.add_argument("--sketchy-pharm", help="export of Step 1&2 overlap cards with a Sketchy Pharm tag")
     ap.add_argument("--sketchy-micro", help="export of Step 1&2 overlap cards with a Sketchy Micro tag")
@@ -224,9 +238,19 @@ def main():
             json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
     if args.step2_bnb:
-        step2 = build_step2_bnb(load_cards(args.step2_bnb))
+        step2 = build_bnb_step(load_cards(args.step2_bnb))
         write("bnb-step2-only-lessons.json", step2)
         print(f"Step 2 B&B (no Step 1-only cards): {step2['total_cards']} cards")
+
+    if args.step1_bnb:
+        step1 = build_bnb_step(load_cards(args.step1_bnb), BNB_STEP1, "Step 1")
+        write("bnb-step1-lessons.json", step1)
+        print(f"Step 1 B&B (no Step 1-only cards): {step1['total_cards']} cards")
+
+    if args.step1_bootcamp:
+        data = build_resource(load_cards(args.step1_bootcamp), BOOTCAMP_STEP1)
+        write("bootcamp-step1-lessons.json", data)
+        print(f"Step 1 Bootcamp (no Step 1-only cards): {data['total_cards']} cards")
 
     if args.shelf:
         shelf = build_shelf(load_cards(args.shelf))

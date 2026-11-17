@@ -37,6 +37,8 @@ Card counts from the AnKing Step deck for cards tagged `#AK_Other::Only_Step_1&2
 
 Beyond the Step 1&2 overlap:
 
+* [Step 1 B&B lessons, no Step 1-only cards]({{ site.baseurl }}/bnb-step1-lessons/): Step 1 Boards & Beyond cards, excluding those tagged as Step 1 only
+* [Step 1 Bootcamp lessons, no Step 1-only cards]({{ site.baseurl }}/bootcamp-step1-lessons/): Step 1 Bootcamp cards, excluding those tagged as Step 1 only
 * [Step 2 B&B lessons, no Step 1-only cards]({{ site.baseurl }}/bnb-step2-only-lessons/): Step 2 Boards & Beyond cards, excluding those tagged as Step 1 only
 * [Shelf exam lessons]({{ site.baseurl }}/shelf-lessons/): total cards per shelf exam, broken down by Boards & Beyond or OnlineMedEd lesson
 
